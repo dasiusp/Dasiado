@@ -218,7 +218,7 @@ def remover(update, context):
 
 
 def main():
-    token = "1094935008:AAGjd242yOm8iLwNJR8C4FD7KYhshIIiWB8"
+    token = "PRIVATE"
     port = int(os.environ.get('PORT', '5000'))
 
     updater = Updater(token, use_context=True)
