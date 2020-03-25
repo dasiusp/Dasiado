@@ -66,28 +66,24 @@ def key_in(bot, update):
         update.message.reply_text("Este grupo não tem permissão para utilizar o bot!", quote=False)
         return
 
+    user = update.message.from_user
+    name = ""
+
     owners = database.get_key_owners()
     names = (owners.to_dict()).values()
 
-    chat_id = update.message.chat.id
-    user = update.message.from_user
-    first = user.first_name
-    last = user.last_name
-
     has_key = False
 
-    if last is None:
-        if first in names:
-            update.message.reply_text("Você já tem chave!", quote=False)
-            has_key = True
-        else:
-            database.insert_name(chat_id, first)
+    if user.last_name is None:
+        name = str(user.first_name)
     else:
-        if (first + " " + last) in names:
-            update.message.reply_text("Você já tem chave!", quote=False)
-            has_key = True
-        else:
-            database.insert_name(chat_id, str(first) + " " + str(last))
+        name = str(user.first_name) + " " + str(user.last_name)
+
+    if name in names:
+        update.message.reply_text("Você já tem chave!", quote=False)
+        has_key = True
+    else:
+        database.insert_name(user.id, name)
 
     if not has_key:
         list_key_owners(bot, update)
@@ -99,28 +95,24 @@ def key_out(bot, update):
         update.message.reply_text("Este grupo não tem permissão para utilizar o bot!", quote=False)
         return
 
+    user = update.message.from_user
+    name = ""
+
     owners = database.get_key_owners()
     names = (owners.to_dict()).values()
 
-    chat_id = update.message.chat.id
-    user = update.message.from_user
-    first = user.first_name
-    last = user.last_name
+    if user.last_name is None:
+        name = str(user.first_name)
+    else:
+        name = str(user.first_name) + " " + str(user.last_name)
 
     has_key = True
 
-    if last is None:
-        if first in names:
-            database.delete_name(chat_id)
-        else:
-            update.message.reply_text("Você ainda não tem chave!", quote=False)
-            has_key = False
+    if name in names:
+        database.delete_name(user.id)
     else:
-        if (first + " " + last) in names:
-            database.delete_name(chat_id)
-        else:
-            update.message.reply_text("Você ainda não tem chave!", quote=False)
-            has_key = False
+        update.message.reply_text("Você ainda não tem chave!", quote=False)
+        has_key = False
 
     owners = database.get_key_owners()
     names = (owners.to_dict()).values()
